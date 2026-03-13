@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidScamNumber(data) {
+      return data.number is string && 
+             data.riskScore is number && 
+             data.reportCount is int;
+    }
+
+    function isValidLog(data) {
+      return data.ip is string && 
+             data.timestamp is string;
+    }
+
+    function isValidReport(data) {
+      return data.target is string && 
+             data.type in ['url', 'phone'] && 
+             data.reporterUid == request.auth.uid;
+    }
+
+    // Scam Numbers: Publicly readable for checking, but only authenticated users can report (indirectly via function or limited write)
+    match /scamNumbers/{numberId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && isValidScamNumber(request.resource.data);
+    }
+
+    // Honeypot Logs: Only admins (or system) should read, but anyone (the trap) can create
+    match /honeypotLogs/{logId} {
+      allow read: if isAuthenticated(); // Simplified for demo, ideally admin only
+      allow create: if true; // The honeypot itself writes here
+    }
+
+    // User Reports: Users can create their own reports, read their own
+    match /reports/{reportId} {
+      allow read: if isAuthenticated() && (resource.data.reporterUid == request.auth.uid);
+      allow create: if isAuthenticated() && isValidReport(request.resource.data);
+    }
+  }
+}

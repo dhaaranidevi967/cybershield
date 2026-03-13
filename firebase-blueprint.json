@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "ScamNumber": {
+      "title": "Scam Number",
+      "description": "A reported scam phone number",
+      "type": "object",
+      "properties": {
+        "number": { "type": "string", "description": "The phone number" },
+        "riskScore": { "type": "number", "description": "Calculated risk score 0-100" },
+        "reportCount": { "type": "integer", "description": "Total number of reports" },
+        "scamType": { "type": "string", "description": "Type of scam (e.g., Bank, OTP)" },
+        "lastReported": { "type": "string", "format": "date-time" }
+      },
+      "required": ["number", "riskScore", "reportCount"]
+    },
+    "HoneypotLog": {
+      "title": "Honeypot Log",
+      "description": "Activity log from the honeypot trap",
+      "type": "object",
+      "properties": {
+        "ip": { "type": "string" },
+        "location": { "type": "string" },
+        "behavior": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ip", "timestamp"]
+    },
+    "UserReport": {
+      "title": "User Report",
+      "description": "A report submitted by a user",
+      "type": "object",
+      "properties": {
+        "target": { "type": "string", "description": "The URL or phone number reported" },
+        "type": { "type": "string", "enum": ["url", "phone"] },
+        "description": { "type": "string" },
+        "reporterUid": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["target", "type", "reporterUid", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/scamNumbers/{numberId}": {
+      "schema": "ScamNumber",
+      "description": "Collection of reported scam phone numbers"
+    },
+    "/honeypotLogs/{logId}": {
+      "schema": "HoneypotLog",
+      "description": "Logs of suspicious activity on honeypot pages"
+    },
+    "/reports/{reportId}": {
+      "schema": "UserReport",
+      "description": "User submitted reports for URLs or phone numbers"
+    }
+  }
+}

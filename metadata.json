@@ -1,0 +1,7 @@
+{
+  "name": "AI Cyber Safety Shield",
+  "description": "An AI-powered cyber safety platform to protect users from online scams, phishing websites, and fraudulent calls.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
